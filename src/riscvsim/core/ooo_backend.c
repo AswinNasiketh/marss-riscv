@@ -477,7 +477,7 @@ oo_core_rob_commit(OOCore *core)
             if (s->simcpu->params->do_sim_trace)
             {
                 sim_trace_commit(s->simcpu->trace,
-                                               s->simcpu->clock, s->priv, e);
+                                               s->simcpu->clock, s->priv, e, s);
             }
 
             if (s->sim_params->enable_stats_display)

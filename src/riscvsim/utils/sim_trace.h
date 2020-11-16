@@ -30,6 +30,7 @@
 #include <inttypes.h>
 #include <stdio.h>
 
+
 #include "cpu_latches.h"
 #include "sim_exception.h"
 
@@ -38,11 +39,13 @@ typedef struct SimTrace
     FILE *trace_fp;
 } SimTrace;
 
+#include "../../riscv_cpu_priv.h"
+
 SimTrace *sim_trace_init();
 void sim_trace_start(SimTrace *s, const char *filename);
 void sim_trace_stop(SimTrace *s);
 void sim_trace_commit(const SimTrace *s, uint64_t clock_cycle, int cpu_mode,
-                      InstructionLatch *e);
+                 InstructionLatch *e, RISCVCPUState *cs);
 void sim_trace_exception(const SimTrace *s, uint64_t clock_cycle, int cpu_mode,
                          SimException *e);
 void sim_trace_free(SimTrace **s);

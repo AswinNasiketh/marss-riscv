@@ -28,6 +28,8 @@
 #include <stdlib.h>
 
 #include "sim_trace.h"
+#include "string.h"
+
 
 void
 sim_trace_start(SimTrace *s, const char *filename)
@@ -44,13 +46,25 @@ sim_trace_stop(SimTrace *s)
 
 void
 sim_trace_commit(const SimTrace *s, uint64_t clock_cycle, int cpu_mode,
-                 InstructionLatch *e)
+                 InstructionLatch *e, RISCVCPUState *cs)
 {
-    fprintf(s->trace_fp, "cycle=%" TARGET_ULONG_FMT, clock_cycle);
-    fprintf(s->trace_fp, " pc=%" TARGET_ULONG_HEX, e->ins.pc);
-    fprintf(s->trace_fp, " insn=%" PRIx32, e->ins.binary);
+    // fprintf(s->trace_fp, "cycle=%" TARGET_ULONG_FMT, clock_cycle);
+    fprintf(s->trace_fp, "pc=%" TARGET_ULONG_HEX, e->ins.pc);
+    // fprintf(s->trace_fp, " insn=%" PRIx32, e->ins.binary);
     fprintf(s->trace_fp, " %s", e->ins.str);
-    fprintf(s->trace_fp, " mode=%s", cpu_mode_str[cpu_mode]);
+
+    //print base reg for jump register instrs
+    char jalr_str[] = "jalr";
+    char cjalr_str[] = "c.jalr";
+    char cjr_str[] = "c.jr";
+    if(strncmp(e->ins.str, jalr_str, 4) == 0 || 
+        strncmp(e->ins.str, cjalr_str, 6) == 0 ||
+        strncmp(e->ins.str, cjr_str, 4) == 0 
+    ){
+        fprintf(s->trace_fp, " rs1_val=%" TARGET_ULONG_HEX, cs->reg[e->ins.rs1]);
+    }
+
+    // fprintf(s->trace_fp, " mode=%s", cpu_mode_str[cpu_mode]); //disabled since all simulations will be done with user mode
     fprintf(s->trace_fp, "\n");
 }
 
