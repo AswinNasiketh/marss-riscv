@@ -53,15 +53,33 @@ sim_trace_commit(const SimTrace *s, uint64_t clock_cycle, int cpu_mode,
     // fprintf(s->trace_fp, " insn=%" PRIx32, e->ins.binary);
     fprintf(s->trace_fp, " %s", e->ins.str);
 
-    //print base reg for jump register instrs
-    char jalr_str[] = "jalr";
-    char cjalr_str[] = "c.jalr";
-    char cjr_str[] = "c.jr";
-    if(strncmp(e->ins.str, jalr_str, 4) == 0 || 
-        strncmp(e->ins.str, cjalr_str, 6) == 0 ||
-        strncmp(e->ins.str, cjr_str, 4) == 0 
+    //print source reg for compressed ISA conditional branches
+    char cbeqz_str[] = "c.beqz";
+    char cbnez_str[] = "c.bnez";
+    if(strncmp(e->ins.str, cbeqz_str, 6) == 0 || 
+        strncmp(e->ins.str, cbnez_str, 6) == 0 || 
     ){
         fprintf(s->trace_fp, " rs1_val=%" TARGET_ULONG_HEX, cs->reg[e->ins.rs1]);
+    }
+
+    char beq_str[] = "beq";
+    char bne_str[] = "bne";
+    char blt_str[] = "blt";
+    char bge_str[] = "bge";
+    char bltu_str[] = "bltu";
+    char bgeu_str[] = "bgeu";
+
+
+    //print source reg 1 and source reg 2 for conditional branches
+    if(strncmp(e->ins.str, beq_str, 3) == 0 ||
+        strncmp(e->ins.str, bne_str, 3) == 0 ||
+        strncmp(e->ins.str, blt_str, 3) == 0 ||
+        strncmp(e->ins.str, bge_str, 3) == 0 ||
+        strncmp(e->ins.str, bltu_str, 4) == 0 ||
+        strncmp(e->ins.str, bgeu_str, 4) == 0 
+    ){
+        fprintf(s->trace_fp, " rs1_val=%" TARGET_ULONG_HEX, cs->reg[e->ins.rs1]);
+        fprintf(s->trace_fp, " rs2_val=%" TARGET_ULONG_HEX, cs->reg[e->ins.rs2]);
     }
 
     // fprintf(s->trace_fp, " mode=%s", cpu_mode_str[cpu_mode]); //disabled since all simulations will be done with user mode
